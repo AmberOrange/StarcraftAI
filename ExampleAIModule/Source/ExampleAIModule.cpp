@@ -153,26 +153,26 @@ void ExampleAIModule::onUnitHide(BWAPI::Unit unit)
 //Called when a new unit has been created.
 //Note: The event is called when the new unit is built, not when it
 //has been finished.
-void ExampleAIModule::onUnitCreate(BWAPI::Unit unit)
-{
-	if (unit->getPlayer() == Broodwar->self())
-	{
-		Broodwar->sendText("A %s [%x] has been created at (%d,%d)", unit->getType().getName().c_str(), unit, unit->getPosition().x, unit->getPosition().y);
-	}
-}
+//void ExampleAIModule::onUnitCreate(BWAPI::Unit unit)
+//{
+//	if (unit->getPlayer() == Broodwar->self())
+//	{
+//		Broodwar->sendText("A %s [%x] has been created at (%d,%d)", unit->getType().getName().c_str(), unit, unit->getPosition().x, unit->getPosition().y);
+//	}
+//}
 
 //Called when a unit has been destroyed.
-void ExampleAIModule::onUnitDestroy(BWAPI::Unit unit)
-{
-	if (unit->getPlayer() == Broodwar->self())
-	{
-		Broodwar->sendText("My unit %s [%x] has been destroyed at (%d,%d)", unit->getType().getName().c_str(), unit, unit->getPosition().x, unit->getPosition().y);
-	}
-	else
-	{
-		Broodwar->sendText("Enemy unit %s [%x] has been destroyed at (%d,%d)", unit->getType().getName().c_str(), unit, unit->getPosition().x, unit->getPosition().y);
-	}
-}
+//void ExampleAIModule::onUnitDestroy(BWAPI::Unit unit)
+//{
+//	if (unit->getPlayer() == Broodwar->self())
+//	{
+//		Broodwar->sendText("My unit %s [%x] has been destroyed at (%d,%d)", unit->getType().getName().c_str(), unit, unit->getPosition().x, unit->getPosition().y);
+//	}
+//	else
+//	{
+//		Broodwar->sendText("Enemy unit %s [%x] has been destroyed at (%d,%d)", unit->getType().getName().c_str(), unit, unit->getPosition().x, unit->getPosition().y);
+//	}
+//}
 
 //Only needed for Zerg units.
 //No need to change this.
@@ -314,8 +314,8 @@ void ExampleAIModule::showForces()
 	}
 }
 
-//Called when a unit has been completed, i.e. finished built.
-void ExampleAIModule::onUnitComplete(BWAPI::Unit unit)
-{
-	//Broodwar->sendText("A %s [%x] has been completed at (%d,%d)",unit->getType().getName().c_str(),unit,unit->getPosition().x,unit->getPosition().y);
-}
+////Called when a unit has been completed, i.e. finished built.
+//void ExampleAIModule::onUnitComplete(BWAPI::Unit unit)
+//{
+//	//Broodwar->sendText("A %s [%x] has been completed at (%d,%d)",unit->getType().getName().c_str(),unit,unit->getPosition().x,unit->getPosition().y);
+//}

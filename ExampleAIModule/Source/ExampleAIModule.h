@@ -4,6 +4,8 @@
 #include <BWTA.h>
 #include <windows.h>
 
+#include <vector>
+
 extern bool analyzed;
 extern bool analysis_just_finished;
 extern BWTA::Region* home;
@@ -12,11 +14,18 @@ DWORD WINAPI AnalyzeThread();
 
 using namespace BWAPI;
 using namespace BWTA;
+using namespace std;
 
 class ExampleAIModule : public BWAPI::AIModule
 {
 public:
 	//Methods inherited from BWAPI:AIModule
+
+	ExampleAIModule() { Broodwar->printf("START!!!");
+	initAI();
+	//Broodwar->sendText("");
+	//Broodwar->drawTextScreen()
+	};
 	virtual void onStart();
 	virtual void onEnd(bool isWinner);
 	virtual void onFrame();
@@ -41,4 +50,38 @@ public:
 	void showPlayers();
 	void showForces();
 	Position findGuardPoint();
+
+private:
+	enum BuildType
+	{
+		Build
+	};
+	struct BuildOrder
+	{
+		UnitType ut;
+		BuildType bt;
+		int foodReq;
+		int SCVCap;
+		int marineCap;
+	};
+	struct ActiveOrder
+	{
+		Unit u;
+		BuildOrder bo;
+	};
+
+	int SCVCap;
+	int SCVCount;
+	int marineCap;
+	int marineCount;
+
+	int foodCount;
+	int mineralCost;
+
+	vector<BuildOrder> mBuildOrder;
+	vector<ActiveOrder> mActiveOrder;
+
+	void initAI();
+	Unit findUnit(UnitType ut);
+	void workLazyWorkers();
 };
