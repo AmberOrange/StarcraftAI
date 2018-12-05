@@ -93,11 +93,16 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="MyAIModuleBorrowed.cpp" />
     <ClCompile Include="OnFrame.cpp" />
+    <ClCompile Include="SCV.cpp" />
     <ClCompile Include="Source\Dll.cpp" />
     <ClCompile Include="Source\ExampleAIModule.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="SCV.hpp" />
+    <ClInclude Include="USM.hpp" />
+    <ClInclude Include="MyAIModule.hpp" />
     <ClInclude Include="Source\ExampleAIModule.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
