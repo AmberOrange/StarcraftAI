@@ -43,6 +43,9 @@ void ExampleAIModule::onStart()
 			}
 		}
 	}
+
+
+	initAI();
 }
 
 //Called when a game is ended.
@@ -76,7 +79,11 @@ Position ExampleAIModule::findGuardPoint()
 		}
 	}
 
-	return choke->getCenter();
+	Position line = choke->getSides().second - choke->getSides().first;
+	Position oneWay(line.y, -line.x);
+	//Position otherWay = line * (-dot) - up;
+	return choke->getCenter() + oneWay * 2;
+	//return line;
 }
 
 //Is called when text is written in the console window.
@@ -176,10 +183,10 @@ void ExampleAIModule::onUnitHide(BWAPI::Unit unit)
 
 //Only needed for Zerg units.
 //No need to change this.
-void ExampleAIModule::onUnitMorph(BWAPI::Unit unit)
-{
-	//Broodwar->sendText("A %s [%x] has been morphed at (%d,%d)",unit->getType().getName().c_str(),unit,unit->getPosition().x,unit->getPosition().y);
-}
+//void ExampleAIModule::onUnitMorph(BWAPI::Unit unit)
+//{
+//	Broodwar->sendText("A %s [%x] has been morphed at (%d,%d)",unit->getType().getName().c_str(),unit,unit->getPosition().x,unit->getPosition().y);
+//}
 
 //No need to change this.
 void ExampleAIModule::onUnitRenegade(BWAPI::Unit unit)

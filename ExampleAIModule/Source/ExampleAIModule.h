@@ -4,6 +4,8 @@
 #include <BWTA.h>
 #include <windows.h>
 
+#include <cmath>
+
 #include <vector>
 
 extern bool analyzed;
@@ -21,8 +23,8 @@ class ExampleAIModule : public BWAPI::AIModule
 public:
 	//Methods inherited from BWAPI:AIModule
 
-	ExampleAIModule() { Broodwar->printf("START!!!");
-	initAI();
+	ExampleAIModule() { //Broodwar->printf("START!!!");
+	//initAI();
 	//Broodwar->sendText("");
 	//Broodwar->drawTextScreen()
 	};
@@ -54,34 +56,56 @@ public:
 private:
 	enum BuildType
 	{
-		Build
+		Build,
+		Addon
 	};
+
+	struct UnitCounter
+	{
+		int SCV;
+		int marine;
+		int siege;
+		int medic;
+	};
+
 	struct BuildOrder
 	{
 		UnitType ut;
 		BuildType bt;
-		int foodReq;
-		int SCVCap;
-		int marineCap;
+		//int foodReq;
+		//int SCVCap;
+		//int marineCap;
+		UnitCounter unitCap;
 	};
 	struct ActiveOrder
 	{
 		Unit u;
+		TilePosition pos;
 		BuildOrder bo;
 	};
 
-	int SCVCap;
-	int SCVCount;
-	int marineCap;
-	int marineCount;
-
-	int foodCount;
+	UnitCounter mUnitCap;
+	UnitCounter mUnitCount;
+	//int SCVCap;
+	//int SCVCount;
+	int SCVGasCap;
+	//int marineCap;
+	//int marineCount;
+	//int siegeCap;
+	//int siegeCount;
+	//int foodCount;
 	int mineralCost;
+	int gasCost;
 
 	vector<BuildOrder> mBuildOrder;
 	vector<ActiveOrder> mActiveOrder;
 
+	Position mChokePoint;
+	Position mHomePoint;
+
 	void initAI();
 	Unit findUnit(UnitType ut);
 	void workLazyWorkers();
+	void tormentActiveOrders();
+	void checkCreatedUnit(Unit unit);
 };
