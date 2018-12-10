@@ -7,6 +7,7 @@
 #include <cmath>
 
 #include <vector>
+#include <list>
 
 extern bool analyzed;
 extern bool analysis_just_finished;
@@ -96,16 +97,35 @@ private:
 	//int foodCount;
 	int mineralCost;
 	int gasCost;
+	int supplyCost;
+
+	Unit researchSiege;
+	Unit addonMachine;
+
+	bool goHam;
+	vector<std::pair<int, int>> mDetectedEnemyUnits;
+	int mTotalDetectedEnemies;
 
 	vector<BuildOrder> mBuildOrder;
 	vector<ActiveOrder> mActiveOrder;
 
 	Position mChokePoint;
+	Position mGuardPoint;
 	Position mHomePoint;
+	Position mAttackPoint;
 
 	void initAI();
 	Unit findUnit(UnitType ut);
 	void workLazyWorkers();
 	void tormentActiveOrders();
 	void checkCreatedUnit(Unit unit);
+	TilePosition findPlaceForBunker(Unit builder);
+	void drawBunker();
+	void checkForRepairs();
+	void makeStuffPhase();
+	void attackStuffPhase();
+	void attackUnitAI(Unit u);
+	void marineAI(Unit u);
+	void siegeAITank(Unit u);
+	void siegeAISiege(Unit u);
 };

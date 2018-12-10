@@ -82,6 +82,7 @@ Position ExampleAIModule::findGuardPoint()
 	Position line = choke->getSides().second - choke->getSides().first;
 	Position oneWay(line.y, -line.x);
 	//Position otherWay = line * (-dot) - up;
+	this->mGuardPoint = choke->getCenter();
 	return choke->getCenter() + oneWay * 2;
 	//return line;
 }
@@ -136,25 +137,70 @@ void ExampleAIModule::onNukeDetect(BWAPI::Position target)
 //No need to change this.
 void ExampleAIModule::onUnitDiscover(BWAPI::Unit unit)
 {
-	//Broodwar->sendText("A %s [%x] has been discovered at (%d,%d)",unit->getType().getName().c_str(),unit,unit->getPosition().x,unit->getPosition().y);
+	if (unit->getPlayer()->isEnemy(Broodwar->self()))
+	{
+		//bool found = false;
+		//for (std::pair<int, int> &u : this->mDetectedEnemyUnits)
+		//{
+		//	if (u.first == unit->getType().getID())
+		//	{
+		//		u.second++;
+		//		found = true;
+		//		break;
+		//	}
+		//}
+		//if (!found)
+		//	this->mDetectedEnemyUnits.push_back(std::pair<int, int>(unit->getType().getID(), 1));
+
+		//this->mTotalDetectedEnemies++;
+
+		//Broodwar->sendText("A %s [%x] has been discovered at (%d,%d)",unit->getType().getName().c_str(),unit,unit->getPosition().x,unit->getPosition().y);
+		//Broodwar->sendText("A %s [%x] has been spotted at (%d,%d)", unit->getType().getName().c_str(), unit, unit->getPosition().x, unit->getPosition().y);
+		Broodwar->setLocalSpeed(20);
+	}
 }
 
 //No need to change this.
 void ExampleAIModule::onUnitEvade(BWAPI::Unit unit)
 {
-	//Broodwar->sendText("A %s [%x] was last accessible at (%d,%d)",unit->getType().getName().c_str(),unit,unit->getPosition().x,unit->getPosition().y);
+	//if (unit->getPlayer()->isEnemy(Broodwar->self()))
+	//{
+	//	for (std::pair<int, int> &u : this->mDetectedEnemyUnits)
+	//	{
+	//		if (u.first == unit->getType().getID())
+	//		{
+	//			u.second--;
+	//			break;
+	//		}
+	//	}
+	//	this->mTotalDetectedEnemies--;
+	//	//Broodwar->sendText("A %s [%x] was last seen at (%d,%d)", unit->getType().getName().c_str(), unit, unit->getPosition().x, unit->getPosition().y);
+	//	Broodwar->sendText("A %s [%x] was last accessible at (%d,%d)",unit->getType().getName().c_str(),unit,unit->getPosition().x,unit->getPosition().y);
+	//}
 }
 
 //No need to change this.
 void ExampleAIModule::onUnitShow(BWAPI::Unit unit)
 {
-	//Broodwar->sendText("A %s [%x] has been spotted at (%d,%d)",unit->getType().getName().c_str(),unit,unit->getPosition().x,unit->getPosition().y);
+	
 }
 
 //No need to change this.
 void ExampleAIModule::onUnitHide(BWAPI::Unit unit)
 {
+	//if (unit->getPlayer()->isEnemy(Broodwar->self()))
+	//{
+	//	for (std::pair<int, int> &u : this->mDetectedEnemyUnits)
+	//	{
+	//		if (u.first == unit->getType().getID())
+	//		{
+	//			u.second--;
+	//			break;
+	//		}
+	//	}
+	//	this->mTotalDetectedEnemies--;
 	//Broodwar->sendText("A %s [%x] was last seen at (%d,%d)",unit->getType().getName().c_str(),unit,unit->getPosition().x,unit->getPosition().y);
+	//}
 }
 
 //Called when a new unit has been created.
