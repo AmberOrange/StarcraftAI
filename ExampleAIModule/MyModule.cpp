@@ -7,13 +7,7 @@
 void ExampleAIModule::initAI()
 {
 	bw->setLocalSpeed(0);
-	//this->SCVCap = 9;
-	//this->marineCap = 0;
-	//this->SCVCount = 0;
-	//this->marineCount = 0;
 	this->SCVGasCap = 2;
-	this->mTotalDetectedEnemies = 0;
-
 
 	this->mUnitCap =	{ 7,0,0,0 };
 	this->mUnitCount =	{ 0,0,0,0 };
@@ -35,17 +29,11 @@ void ExampleAIModule::initAI()
 		if (pos != this->mHomePoint)
 			this->mAttackPoint = pos;
 	}
-	//this->mBuildOrder.push_back(
-	//	{ UnitTypes::Terran_Machine_Shop,	BuildType::Addon,	{ 12,8,3,0 } });
+
+
+	// This is the build order that has to be completed before we attack
 	this->mBuildOrder.push_back(
 		{ UnitTypes::Terran_Factory,		BuildType::Build,	{ 12,20,5,5 } });
-	//this->mBuildOrder.push_back(
-	//	{ UnitTypes::Terran_Supply_Depot,	BuildType::Build,	{ 12,3,0,0 } });
-	/*for(int i = 0; i < 20; i++)
-		this->mBuildOrder.push_back(
-			{ UnitTypes::Terran_Bunker,			BuildType::Build,	{ 12,8,0,0 } });*/
-	//this->mBuildOrder.push_back(
-	//	{ UnitTypes::Terran_Bunker,			BuildType::Build,	{ 0,24,0,0 } });
 	this->mBuildOrder.push_back(
 		{ UnitTypes::Terran_Bunker,			BuildType::Build,	{ 0,20,0,0 } });
 	this->mBuildOrder.push_back(
@@ -60,21 +48,13 @@ void ExampleAIModule::initAI()
 		{ UnitTypes::Terran_Bunker,			BuildType::Build,	{ 0,8,0,0 } });
 	this->mBuildOrder.push_back(
 		{ UnitTypes::Terran_Barracks,		BuildType::Build,	{ 12,4,0,0 } });
-	/*this->mBuildOrder.push_back(
-		{ UnitTypes::Terran_Supply_Depot,	BuildType::Build,	{ 12,0,0,0 } });*/
 
-
+	// Move a SCV to choke to know where to build later on
 	this->findUnit(UnitTypes::Terran_SCV)->move(this->mChokePoint);
-	//this->mBuildOrder.push_back(
-	//	{ UnitTypes::Terran_Supply_Depot, BuildType::Build, 9, 12, 0 });
 }
 
 void ExampleAIModule::onUnitCreate(BWAPI::Unit unit)
 {
-	/*if (unit->getPlayer() == Broodwar->self())
-	{
-		Broodwar->sendText("A %s [%x] has been created at (%d,%d)", unit->getType().getName().c_str(), unit, unit->getPosition().x, unit->getPosition().y);
-	}*/
 	if (unit->getPlayer() == bw->self())
 	{
 		if (unit->getType() == UnitTypes::Terran_SCV)
@@ -86,7 +66,7 @@ void ExampleAIModule::onUnitCreate(BWAPI::Unit unit)
 		else if (unit->getType() == UnitTypes::Terran_Siege_Tank_Tank_Mode)
 			this->mUnitCount.siege++;
 		else
-			this->checkCreatedUnit(unit);
+			this->confirmActiveOrderDone(unit);
 	}
 }
 
@@ -99,8 +79,6 @@ void ExampleAIModule::onUnitDestroy(BWAPI::Unit unit)
 		else if (unit->getType() == UnitTypes::Terran_Marine)
 		{
 			this->mUnitCount.marine--;
-			//bw->printf("Marine got Destroyed!!!");
-			//bw->setLocalSpeed(30);
 		}
 		else if (unit->getType() == UnitTypes::Terran_Medic)
 			this->mUnitCount.medic--;
@@ -114,22 +92,12 @@ void ExampleAIModule::onUnitDestroy(BWAPI::Unit unit)
 				{ unit->getType(),		BuildType::Build,	{ 0,0,0,0 } });
 		}
 	}
-	else {
-		/*for (std::pair<int, int> &u : this->mDetectedEnemyUnits)
-		{
-			if (u.first == unit->getType().getID())
-			{
-				u.second--;
-				break;
-			}
-		}*/
-	}
 }
 
 void ExampleAIModule::onUnitMorph(BWAPI::Unit unit)
 {
 	if (unit->getPlayer() == bw->self())
-		this->checkCreatedUnit(unit);
+		this->confirmActiveOrderDone(unit);
 }
 
 //Called when a unit has been completed, i.e. finished built.
@@ -146,7 +114,6 @@ void ExampleAIModule::onUnitComplete(BWAPI::Unit unit)
 		this->supplyCost -= 8;
 	else if (unit->getType() == UnitTypes::Terran_Machine_Shop)
 		this->researchSiege = unit;
-	//Broodwar->sendText("A %s [%x] has been completed at (%d,%d)",unit->getType().getName().c_str(),unit,unit->getPosition().x,unit->getPosition().y);
 }
 
 
@@ -177,7 +144,7 @@ Unit ExampleAIModule::findUnit(UnitType ut)
 	return nullptr;
 }
 
-void ExampleAIModule::workLazyWorkers()
+void ExampleAIModule::UpdateUnits()
 {
 	for (Unit u : bw->self()->getUnits())
 		if (u->getType() == UnitTypes::Terran_SCV)
@@ -192,36 +159,13 @@ void ExampleAIModule::workLazyWorkers()
 					{
 						closestMineral = m;
 					}
-					//bw->printf("%d", commandCenter->getDistance(m));
-					//if (commandCenter->getDistance(m) < 60)
-					//{
-
-					//	closestMineral = m;
-					//	break;
-					//}
 				}
 				if (closestMineral != NULL)
 				{
 					u->rightClick(closestMineral);
-					//Broodwar->printf("Send worker %d to mineral %d", u->getID(), closestMineral->getID());
 				}
 			}
 		}
-		//else if (u->getType() == UnitTypes::Terran_Bunker)
-		//{
-		//	if (!this->goHam && u->canLoad())
-		//	{
-		//		//Unitset marines = u->getUnitsInRadius(30);
-		//		for (Unit u2 : bw->self()->getUnits())
-		//		{
-		//			if (u2->getType() == UnitTypes::Terran_Marine && !u2->isLoaded() && u2->isIdle())
-		//			{
-		//				u->load(u2);
-		//				break;
-		//			}
-		//		}
-		//	}
-		//}
 		else if (u->getType() == UnitTypes::Terran_Refinery)
 		{
 			int nrRefWorkers = 0;
@@ -232,7 +176,6 @@ void ExampleAIModule::workLazyWorkers()
 			}
 			if (nrRefWorkers < this->SCVGasCap)
 			{
-				//bw->printf("RefWorkers: %d", nrRefWorkers);
 				for (Unit u2 : bw->self()->getUnits())
 				{
 					if (u2->getType() == UnitTypes::Terran_SCV)
@@ -264,16 +207,12 @@ void ExampleAIModule::tormentActiveOrders()
 			{
 				if (ao.bo.ut == UnitTypes::Terran_Bunker)
 				{
-					//bw->printf("%s", ao.u->getOrder().c_str());
-					//bw->printf("Can't Build %s", ao.bo.ut.c_str());
-					//ao.u->move(Position(ao.pos.x*32,ao.pos.y*32));
+					
 					bw->drawCircle(CoordinateType::Map, ao.pos.x * 32, ao.pos.y * 32, 16, Color(255, 0, 0), true);
 					bw->drawCircle(CoordinateType::Map, ao.u->getPosition().x, ao.u->getPosition().y, 16, Color(255, 255, 0), true);
 					if (!bw->canBuildHere(ao.pos, ao.bo.ut))
 					{
-						//bw->printf("I can't %s build here...", ao.bo.ut.c_str());
 						TilePosition newPos = findPlaceForBunker(ao.u);
-						//bw->printf("Compare: %d:%d - %d:%d", ao.pos.x, ao.pos.y, newPos.x, newPos.y);
 						ao.pos = newPos;
 					}
 				}
@@ -282,12 +221,12 @@ void ExampleAIModule::tormentActiveOrders()
 	}
 }
 
-void ExampleAIModule::checkCreatedUnit(Unit unit)
+// This function is being called when we're done with an active order
+// and want to update the cap.
+void ExampleAIModule::confirmActiveOrderDone(Unit unit)
 {
 	for (int i = 0; i < this->mActiveOrder.size(); i++)
 	{
-		/*if (unit->getType() == UnitTypes::Terran_Refinery)
-			bw->printf("REFINERY!!!");*/
 		if (unit->getType() == this->mActiveOrder[i].bo.ut)
 		{
 			this->mUnitCap.SCV = std::max(this->mActiveOrder[i].bo.unitCap.SCV, this->mUnitCap.SCV);
@@ -309,9 +248,7 @@ TilePosition ExampleAIModule::findPlaceForBunker(Unit builder)
 
 	int tileRadius = 3;
 	Position line = this->mGuardPoint - this->mChokePoint;
-	//bw->printf("%d - %d", line.x, line.y);
 	TilePosition tChoke(this->mChokePoint.x / 32, this->mChokePoint.y / 32);
-	//float direction = atanf((float)line.y / (float)line.x);
 	float direction = acosf((float)line.x / (float)line.getLength()) + 3.14f;
 	while (!foundIt && tileRadius < 20)
 	{
@@ -328,8 +265,6 @@ TilePosition ExampleAIModule::findPlaceForBunker(Unit builder)
 		}
 		tileRadius++;
 	}
-	//if (!foundIt)
-		//bw->printf("We aint found shit");
 	return tPos;
 }
 
@@ -339,13 +274,8 @@ void ExampleAIModule::drawBunker()
 
 	int tileRadius = 3;
 	Position line = this->mGuardPoint - this->mChokePoint;
-	//float linex = (float)line.x / (float)line.getLength();
-	//float liney = (float)line.y / (float)line.getLength();
-	//bw->printf("%d - %d", line.x, line.y);
 	TilePosition tChoke(this->mChokePoint.x / 32, this->mChokePoint.y / 32);
-	//float direction = atanf((float)line.y / (float)line.x);
 	float direction = acosf((float)line.x / (float)line.getLength()) + 3.14f;
-	//bw->printf("%f",direction);
 	while ( tileRadius < 20)
 	{
 		for (float i = -1.57f; i < 1.57f; i += 0.39f * 1.5f)
@@ -359,36 +289,18 @@ void ExampleAIModule::drawBunker()
 	}
 }
 
-void ExampleAIModule::checkForRepairs()
-{
-	Unit scv = nullptr;
-	for (Unit u : bw->self()->getUnits())
-	{
-		if (scv == nullptr)
-			scv = this->findUnit(UnitTypes::Terran_SCV);
-		if (u->getHitPoints() != u->getType().maxHitPoints() && scv->repair(u))
-		{
-			//bw->setLocalSpeed(30);
-			bw->printf("REPARING");
-			scv->rightClick(u);
-			scv = nullptr;
-		}
-	}
-}
-
-void ExampleAIModule::makeStuffPhase()
+void ExampleAIModule::updateFunction()
 {
 	Unit target;
 	if (bw->getFrameCount() % 20 == 0)
 	{
-		this->workLazyWorkers();
+		this->UpdateUnits();
 		this->tormentActiveOrders();
 	}
-	//this->checkForRepairs();
-	//bw->printf("%d - %d", (mUnitCap.marine + mUnitCap.medic + mUnitCap.SCV + mUnitCap.siege + 3), bw->self()->supplyTotal()/2 + this->supplyCost);
+
+	// If we're running out of supplies for coming units, make more supply depots
 	if ((mUnitCap.marine + mUnitCap.medic + mUnitCap.SCV + mUnitCap.siege + 3) > (bw->self()->supplyTotal() / 2) + this->supplyCost)
 	{
-		//bw->printf("BUILD SUPPLY");
 		if ((bw->self()->minerals() - this->mineralCost) >= UnitTypes::Terran_Supply_Depot.mineralPrice())
 		{
 			Unit bu = findUnit(UnitTypes::Terran_SCV);
@@ -411,6 +323,7 @@ void ExampleAIModule::makeStuffPhase()
 		}
 	}
 
+	// If we can make an SCV, and we're not capped, do it.
 	if (this->mUnitCount.SCV < this->mUnitCap.SCV)
 	{
 		if ((bw->self()->minerals() - this->mineralCost) >= UnitTypes::Terran_SCV.mineralPrice())
@@ -419,6 +332,7 @@ void ExampleAIModule::makeStuffPhase()
 					target->train(UnitTypes::Terran_SCV);
 	}
 
+	// Same for siege tanks.
 	if (this->mUnitCount.siege < this->mUnitCap.siege)
 	{
 		if ((bw->self()->minerals() - this->mineralCost) >= UnitTypes::Terran_Siege_Tank_Tank_Mode.mineralPrice())
@@ -427,10 +341,10 @@ void ExampleAIModule::makeStuffPhase()
 					if (!target->isTraining() && target->canTrain())
 					{
 						target->train(UnitTypes::Terran_Siege_Tank_Tank_Mode);
-						//bw->printf("Build me some siege tanks please!!!");
 					}
 	}
 
+	// etc. etc.
 	if (this->mUnitCount.medic < this->mUnitCap.medic)
 	{
 		if ((bw->self()->minerals() - this->mineralCost) >= UnitTypes::Terran_Medic.mineralPrice())
@@ -448,6 +362,7 @@ void ExampleAIModule::makeStuffPhase()
 					target->train(UnitTypes::Terran_Marine);
 	}
 
+	// If it's time to research siege
 	if (this->researchSiege != nullptr)
 	{
 		if (this->researchSiege->research(TechTypes::Tank_Siege_Mode))
@@ -457,6 +372,7 @@ void ExampleAIModule::makeStuffPhase()
 		}
 	}
 
+	// If it's time to build the machine shop
 	if (this->addonMachine != nullptr)
 	{
 		if (this->addonMachine->buildAddon(UnitTypes::Terran_Machine_Shop))
@@ -465,8 +381,8 @@ void ExampleAIModule::makeStuffPhase()
 			bw->printf("Adding Machine Shop, Oh yeah!");
 		}
 	}
-	//bw->printf("%d, %d", (int)this->mBuildOrder.back().bt, (int)BuildType::Build);
 
+	// Check if we got any build orders to complete
 	if (this->mBuildOrder.size() > 0)
 	{
 		//bw->printf("There is something to build!");
@@ -484,15 +400,7 @@ void ExampleAIModule::makeStuffPhase()
 					TilePosition pos;
 					if (this->mBuildOrder.back().ut == UnitTypes::Terran_Bunker)
 					{
-						//bw->printf("CHOKE %d, %d", this->mChokePoint.x, this->mChokePoint.y);
-						//bw->printf("HOME %d, %d", this->mHomePoint.x, this->mHomePoint.y);
-						//desiredPos = this->mChokePoint - this->mHomePoint;
-						//bw->printf("DESIREDPOS %d, %d", desiredPos.x, desiredPos.y);
-						//desiredPos = this->mChokePoint - (desiredPos / 4);
-						//desiredPos = this->mChokePoint;
 						pos = this->findPlaceForBunker(bu);
-						//bw->printf("DESIREDPOS %d, %d", desiredPos.x, desiredPos.y);
-						//radius = 10;
 					}
 					else {
 						TilePosition desiredPos(this->mHomePoint.x / 32, this->mHomePoint.y / 32);
@@ -501,11 +409,6 @@ void ExampleAIModule::makeStuffPhase()
 							desiredPos,
 							radius);
 					}
-
-
-
-					//bw->printf("The location I picked is %d, %d!", pos.x/32, pos.y/32);
-					//bw->drawCircle(CoordinateType::Screen, pos.x, pos.y, 3, Color(255,0,0), true);
 
 					ActiveOrder ao =
 					{
@@ -520,22 +423,6 @@ void ExampleAIModule::makeStuffPhase()
 					this->mBuildOrder.pop_back();
 				}
 			}
-			else if (this->mBuildOrder.back().bt == BuildType::Addon)
-			{
-				if (this->mBuildOrder.back().ut == UnitTypes::Terran_Machine_Shop)
-				{
-					//bw->setLocalSpeed(30);
-					Unit u = this->findUnit(UnitTypes::Terran_Factory);
-					bw->printf("Terran_Factory? %s", u->getType().c_str());
-					if (u->canBuildAddon())
-					{
-						bw->printf("I can build it!");
-						/*u->buildAddon(UnitTypes::Terran_Machine_Shop);
-						this->mBuildOrder.pop_back();*/
-					}
-
-				}
-			}
 		}
 	}
 	else {
@@ -544,8 +431,9 @@ void ExampleAIModule::makeStuffPhase()
 			this->mUnitCount.siege == this->mUnitCap.siege &&
 			this->mUnitCount.medic == this->mUnitCap.medic)
 		{
+			// All criterias for the attack is met, let's go!
 			this->goHam = true;
-			bw->printf("GO HAM BOYS");
+			bw->printf("Time to attack!");
 			bw->setLocalSpeed(10);
 			for (Unit u : bw->self()->getUnits())
 			{
@@ -555,30 +443,6 @@ void ExampleAIModule::makeStuffPhase()
 			this->mUnitCap = { 0,50,10,0 };
 		}
 	}
-}
-
-void ExampleAIModule::attackStuffPhase()
-{
-	if (bw->getFrameCount() % 20 == 0)
-	{
-		bw->printf("HAM TIME");
-		for (Unit u : bw->self()->getUnits())
-		{
-			attackUnitAI(u);
-		}
-
-	}
-	//for (Unit u : bw->self()->getUnits())
-	//{
-	//	if (u->isUnderAttack())
-	//	{
-	//		u->attack(bw->getClosestUnit(u->getPosition(), Filter::IsEnemy));
-	//	}
-	//	if (u->canAttackMove() && !u->isAttacking())
-	//	{
-	//		u->attack(this->mAttackPoint);
-	//	}
-	//}
 }
 
 void ExampleAIModule::attackUnitAI(Unit u)
@@ -621,7 +485,6 @@ void ExampleAIModule::marineAI(Unit u)
 			{
 				if (u->getPosition().getDistance(this->mChokePoint) > 30)
 				{
-					// Not in choke
 					if (!u->isMoving())
 						u->move(this->mChokePoint);
 				}
@@ -635,27 +498,10 @@ void ExampleAIModule::marineAI(Unit u)
 	else {
 		if (u->getDistance(this->mAttackPoint) > 1500)
 		{
-
-			//bw->drawCircleMap(this->mAttackPoint, 2000, Color(0, 255, 255), true);
-			/*Unitset uRadius = u->getUnitsInRadius(100, Filter::IsAlly);
-			bool siegeClose = false;;
-			for (Unit u2 : uRadius)
-				if (u2->getType() == UnitTypes::Terran_Siege_Tank_Tank_Mode ||
-					u2->getType() == UnitTypes::Terran_Siege_Tank_Siege_Mode)
-				{
-					siegeClose = true;
-					break;
-				}
-			if (!siegeClose)
-			{
-				
-			}
-				u->holdPosition();
-			else */if ((!u->isAttacking() || u->isIdle()) && !u->isMoving())
+			if ((!u->isAttacking() || u->isIdle()) && !u->isMoving())
 				u->move(this->mAttackPoint);
 		}
 		else {
-			bw->printf("We're close now boys");
 			if (this->mUnitCount.SCV > 0 && (!u->isAttacking() || u->isIdle()) && !u->isFollowing())
 			{
 				int distance = MAXINT;
@@ -702,7 +548,6 @@ void ExampleAIModule::siegeAITank(Unit u)
 		}
 		if (count >= 3)
 		{
-			//bw->printf("Should be Morphing into Siege now!");
 			u->siege();
 		}
 	}
@@ -718,7 +563,6 @@ void ExampleAIModule::siegeAITank(Unit u)
 		{
 			if (u->getPosition().getDistance(this->mChokePoint) < 20)
 			{
-				// Not in choke
 				if (u->isIdle())
 					u->move(this->mChokePoint);
 			}
@@ -734,7 +578,6 @@ void ExampleAIModule::siegeAITank(Unit u)
 void ExampleAIModule::siegeAISiege(Unit u)
 {
 	Unit target = bw->getClosestUnit(u->getPosition(), Filter::IsEnemy);
-	//bw->printf("I'm SIEGED! %d",target);
 	if (target == nullptr || !u->isInWeaponRange(target))
 	{
 		u->unsiege();
@@ -761,7 +604,6 @@ void ExampleAIModule::medicAI(Unit u)
 		{
 			if (u->getPosition().getDistance(this->mChokePoint) > 30)
 			{
-				// Not in choke
 				if (!u->isMoving())
 					u->move(this->mChokePoint);
 			}
@@ -808,14 +650,11 @@ void ExampleAIModule::medicAI(Unit u)
 
 void ExampleAIModule::onFrame()
 {
+	// First, just draw a bunch of information on the screen
 	this->drawTerrainData();
 	this->drawBunker();
 	bw->drawCircle(CoordinateType::Map, this->mChokePoint.x, this->mChokePoint.y,
 		20, Color(255, 255, 0));
-	//bw->drawCircleMap(this->mAttackPoint, 60, Color(150, 150, 100), true);
-	//bw->drawTextScreen(100, 100, "HELLO %d %d", this->mChokePoint.x, this->mChokePoint.y);
-	//bw->drawCircle(CoordinateType::Map, this->mHomePoint.x*32, this->mHomePoint.y*32, 4, Color(255, 0, 0), true);
-	//bw->printf("It works!");
 	bw->drawTextScreen(10, 10, "Build Order Size: %d\nMineralCost: %d\nGasCost: %d\nNext (%d): %s",
 		this->mBuildOrder.size(),
 		this->mineralCost,
@@ -825,12 +664,6 @@ void ExampleAIModule::onFrame()
 	bw->drawTextScreen(200, 10, "Active Order List (%d):", this->mActiveOrder.size());
 	for (int i = 0; i < this->mActiveOrder.size(); i++)
 		bw->drawTextScreen(200, 18 + 8 * i, "%s", this->mActiveOrder[i].bo.ut.c_str());
-
-	bw->drawTextScreen(10, 70, "Enemy Units in sight (%d):", this->mTotalDetectedEnemies);
-	for (int i = 0; i < this->mDetectedEnemyUnits.size(); i++)
-		bw->drawTextScreen(10, 78 + 8 * i, "(%d) %s",
-			this->mDetectedEnemyUnits[i].second,
-			UnitType(this->mDetectedEnemyUnits[i].first).c_str());
 
 	bw->drawTextScreen(400, 20, "SCV: %d (%d)\nMarine: %d (%d)\nSiege: %d (%d)\nMedic: %d (%d)",
 		this->mUnitCount.SCV,
@@ -843,27 +676,5 @@ void ExampleAIModule::onFrame()
 		this->mUnitCap.medic
 	);
 
-	//if (!this->goHam)
-		this->makeStuffPhase();
-	//else
-	//	this->attackStuffPhase();
-
-
-	//if (Broodwar->getFrameCount() % 100 == 0)
-	//{
-	//	for (auto u : Broodwar->self()->getUnits())
-	//	{
-	//		if (u->getType().isWorker())
-	//		{
-	//			Position guardPoint = findGuardPoint();
-	//			u->rightClick(guardPoint);
-	//			break;
-	//		}
-	//	}
-	//}
-
-	//if (analyzed)
-	//{
-	//	drawTerrainData();
-	//}
+	this->updateFunction();
 }

@@ -24,11 +24,7 @@ class ExampleAIModule : public BWAPI::AIModule
 public:
 	//Methods inherited from BWAPI:AIModule
 
-	ExampleAIModule() { //Broodwar->printf("START!!!");
-	//initAI();
-	//Broodwar->sendText("");
-	//Broodwar->drawTextScreen()
-	};
+	ExampleAIModule() { };
 	virtual void onStart();
 	virtual void onEnd(bool isWinner);
 	virtual void onFrame();
@@ -73,9 +69,6 @@ private:
 	{
 		UnitType ut;
 		BuildType bt;
-		//int foodReq;
-		//int SCVCap;
-		//int marineCap;
 		UnitCounter unitCap;
 	};
 	struct ActiveOrder
@@ -87,14 +80,7 @@ private:
 
 	UnitCounter mUnitCap;
 	UnitCounter mUnitCount;
-	//int SCVCap;
-	//int SCVCount;
 	int SCVGasCap;
-	//int marineCap;
-	//int marineCount;
-	//int siegeCap;
-	//int siegeCount;
-	//int foodCount;
 	int mineralCost;
 	int gasCost;
 	int supplyCost;
@@ -103,8 +89,6 @@ private:
 	Unit addonMachine;
 
 	bool goHam;
-	vector<std::pair<int, int>> mDetectedEnemyUnits;
-	int mTotalDetectedEnemies;
 
 	vector<BuildOrder> mBuildOrder;
 	vector<ActiveOrder> mActiveOrder;
@@ -116,14 +100,12 @@ private:
 
 	void initAI();
 	Unit findUnit(UnitType ut);
-	void workLazyWorkers();
+	void UpdateUnits();
 	void tormentActiveOrders();
-	void checkCreatedUnit(Unit unit);
+	void confirmActiveOrderDone(Unit unit);
 	TilePosition findPlaceForBunker(Unit builder);
 	void drawBunker();
-	void checkForRepairs();
-	void makeStuffPhase();
-	void attackStuffPhase();
+	void updateFunction();
 	void attackUnitAI(Unit u);
 	void marineAI(Unit u);
 	void siegeAITank(Unit u);

@@ -21,7 +21,7 @@
     <ClCompile Include="Source\ExampleAIModule.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="OnFrame.cpp">
+    <ClCompile Include="MyModule.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
