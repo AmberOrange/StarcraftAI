@@ -128,4 +128,5 @@ private:
 	void marineAI(Unit u);
 	void siegeAITank(Unit u);
 	void siegeAISiege(Unit u);
+	void medicAI(Unit u);
 };

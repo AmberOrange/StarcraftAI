@@ -83,7 +83,7 @@ Position ExampleAIModule::findGuardPoint()
 	Position oneWay(line.y, -line.x);
 	//Position otherWay = line * (-dot) - up;
 	this->mGuardPoint = choke->getCenter();
-	return choke->getCenter() + oneWay * 2;
+	return choke->getCenter() - oneWay * 2;
 	//return line;
 }
 
@@ -156,7 +156,7 @@ void ExampleAIModule::onUnitDiscover(BWAPI::Unit unit)
 
 		//Broodwar->sendText("A %s [%x] has been discovered at (%d,%d)",unit->getType().getName().c_str(),unit,unit->getPosition().x,unit->getPosition().y);
 		//Broodwar->sendText("A %s [%x] has been spotted at (%d,%d)", unit->getType().getName().c_str(), unit, unit->getPosition().x, unit->getPosition().y);
-		Broodwar->setLocalSpeed(20);
+		//Broodwar->setLocalSpeed(20);
 	}
 }
 
